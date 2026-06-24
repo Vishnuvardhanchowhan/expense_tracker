@@ -27,7 +27,9 @@ import base64
 import os
 import re
 import sys
+import json
 from datetime import datetime, date
+from pathlib import Path
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -51,21 +53,48 @@ SUBJECT_QUERY = "transaction alert for Axis Bank"
 def get_gmail_service():
     """Authenticate with Gmail API and return a service object."""
     creds = None
+    
+    # Try to load from token file first (for local/persistent runs)
     if os.path.exists(TOKEN_FILE):
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+    
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            if not os.path.exists(CREDENTIALS_FILE):
-                sys.exit(
-                    f"Missing {CREDENTIALS_FILE}. Download OAuth client credentials "
-                    f"from Google Cloud Console and save them with that filename."
-                )
-            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+            # Load credentials from Streamlit secrets or file
+            credentials_data = None
+            
+            try:
+                # Try Streamlit secrets first (for cloud deployment)
+                credentials_data = json.loads(st.secrets["google"]["credentials_json"])
+            except (KeyError, FileNotFoundError):
+                # Fall back to local credentials.json file
+                if os.path.exists(CREDENTIALS_FILE):
+                    with open(CREDENTIALS_FILE) as f:
+                        credentials_data = json.load(f)
+                else:
+                    sys.exit(
+                        f"Missing credentials. Either:\n"
+                        f"1. Download OAuth credentials from Google Cloud Console and save as {CREDENTIALS_FILE}\n"
+                        f"2. Or add credentials to Streamlit secrets under [google]credentials_json"
+                    )
+            
+            # Write credentials to temp file for flow
+            temp_creds_file = Path("/tmp/credentials_temp.json")
+            with open(temp_creds_file, "w") as f:
+                json.dump(credentials_data, f)
+            
+            flow = InstalledAppFlow.from_client_secrets_file(str(temp_creds_file), SCOPES)
             creds = flow.run_local_server(port=0)
+            
+            # Clean up temp file
+            temp_creds_file.unlink()
+        
+        # Save token for future use
         with open(TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
+    
     return build("gmail", "v1", credentials=creds)
 
 
