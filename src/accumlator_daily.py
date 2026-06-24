@@ -65,9 +65,21 @@ def get_gmail_service():
                 creds.refresh(Request())
                 return build("gmail", "v1", credentials=creds)
         except Exception:
-            pass  # Token file corrupted or invalid, get new one
+            pass  # Token file corrupted or invalid, try secrets
     
-    # Load credentials from Streamlit secrets or file
+    # Try to load token from Streamlit secrets (for cloud deployment)
+    try:
+        token_data = json.loads(st.secrets["google"]["token_json"])
+        creds = Credentials.from_authorized_user_info(token_data, SCOPES)
+        if creds.valid:
+            return build("gmail", "v1", credentials=creds)
+        elif creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            return build("gmail", "v1", credentials=creds)
+    except (KeyError, FileNotFoundError, TypeError):
+        pass  # Token not in secrets, try credentials flow
+    
+    # Load credentials from Streamlit secrets or file for OAuth flow
     credentials_data = None
     
     try:
