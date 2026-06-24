@@ -1,0 +1,108 @@
+{
+  "_comment": "Edit this file to tune categorization. 'keywords' are matched case-insensitively as a substring against the transaction description/narration (extra spaces are already collapsed by the parser, so 'BLINKIT' matches 'Blinkit              ' fine). First matching category wins, so more specific rules should sit above generic ones. 'people' lets you map known UPI names/IDs directly to Family/Friends. Anything that matches nothing AND looks like a payment to an individual (2-5 word name, no business words) automatically falls into 'Local Shops / Unknown Person' instead of cluttering Uncategorized - that's local vendors (sabzi-wala, kirana, tailor etc.) who use their own name as their UPI ID, which is very common in India. True one-off unknowns still land in Uncategorized.",
+
+  "categories": [
+    {
+      "name": "EMI",
+      "keywords": ["ACH-DR-IDFC FIRST BANK", "ACH-DR-RAZORPAY","SBI CARDS",
+                   "SBI cards and Payment", "LOANCL", "LOAN REPAY", "NACH", "AUTOPAY-LOAN"]
+    },
+    {
+      "name": "Bank Charges",
+      "keywords": ["ECS Txn Chrgs", "Rev.of  ECS"]
+    },
+    {
+      "name": "Rent",
+      "keywords": ["RENT PAYMENT", "LANDLORD", "EAZYAPP", "RENTOK"]
+    },
+    {
+      "name": "Bills & Utilities",
+      "keywords": ["Jio", "/Vi /", "SUN DIRECT", "Sun Direct",
+                   "ELECTRICITY", "RAJA RAJESHWARI ELECT", "Padmavathi Electrical",
+                   "GAS BILL", "BROADBAND", "ACT FIBERNET", "MOBILE RECHARGE",
+                   "Google Pl", "Google India Digital", "URJAVIDHI"]
+    },
+    {
+      "name": "Groceries",
+      "keywords": ["BIGBASKET", "BIG BASKET", "Blinkit", "BLINKIT", "Amazon Pay Groceries",
+                   "MEHER MINI MART", "JAY AMBE SUPER SHOPEE", "Rajender Kirana",
+                   "SHREE BALAJI TRADERS", "GANESH TRADERS", "Max Retail"]
+    },
+    {
+      "name": "Food & Dining",
+      "keywords": ["Swiggy", "SWIGGY", "Zomato", "ZOMATO", "EatClub", "HOTEL RAGHAVENDRA",
+                   "HOTEL SRI RAGHAVENDRA", "HOTEL PNR COMFORT", "MEHFIL RESTAURANT",
+                   "KBR REDDYS FAMILY RES", "CAFE GOOD LUCK", "CHAITANYAS FOOD COURT",
+                   "GAJA FOOD COURT", "TRINETRA FOOD COURT", "HILLSTAR RESTAURANT",
+                   "FRULLATO", "EMMADI FILTER COFFEE", "INFUSION COFFEE", "MERAJ S EK CUP CHAI",
+                   "KANNU KI CHAI", "Limra Tea Point", "Sunny Tea Point", "JUST BAKE",
+                   "SRI SAIRAM BAKERY", "SWISS CASTLE BAKERY", "Pawan sweets",
+                   "M S OLIVE MITHAI", "FAMOUS KULFI", "Pariwar Juice Center", "MILAN JUICE",
+                   "M CORN", "VRUNDAVAN PURE VEG", "GAURIS KITCHEN", "SHRIJI RASOI",
+                   "Wraps and Wiches", "Mohammedia shawarma", "M S MADINA HOTEL",
+                   "KOHINOOR FOOD", "STAR FOODS AND CATERI", "Chai Kings", "Coco Hitech",
+                   "coco hitec", "GANTA VENKATESH", "WOKNSTOVE", "THE SOUTH VENUE",
+                   "Panchakattu Dosa", "Tobox Ventures", "TOBOX VENTURES", "Prism Invesco",
+                   "PRISM INVESCO", "SREE TEJA", "PILLA NAGA SATYA LAK", "BURUGU JYOTHI"]
+    },
+    {
+      "name": "Alcohol & Nightlife",
+      "keywords": ["Sri Thirumala wines", "TEJAS WINES", "SASH COCKTAIL BAR", "URBAN SPIRTZ"]
+    },
+    {
+      "name": "Travel & Transport",
+      "keywords": ["Rapido", "OLA", "UBER", "BPCLVENNALA FILLING", "CYBERABAD FILLING",
+                   "SATHE PATIL PETROLEUM", "INDRA PETRO", "Indian Oil", "THIRUMALA SERVICE CEN",
+                   "IRCTC", "REDBUS", "OYO Rooms", "Hyderabad Metro", "Pune Metro",
+                   "L B Nagar Metro", "KOMATIPALLI TOLL PLAZ", "FASTAG", "ROPPEN TRANSPORTATION",
+                   "ATM-CASH"]
+    },
+    {
+      "name": "Shopping",
+      "keywords": ["Amazon India", "Amazon Pa", "Meesho", "AFREEN TOYS", "N S MOBILES",
+                   "KGN BAGs", "Decathlon", "Lensvision Optics", "Raja Laxmi Stationary",
+                   "FASHNEAR TECHNOLOGIES", "FNF ARENA", "FNF MOTORSPORTS",
+                   "BOLT MOTORCYCLES", "KS MOBILES",
+                   "ADITIYA ENTERPRISES", "NARMADA ENTERPRISES", "Deep Marketing",
+                   "OAM INDUSTRIES", "Vasanth Enterprises", "MANGALI VENKATESHAM", "Miniso", "Zpay Solutions"]
+    },
+    {
+      "name": "Subscriptions",
+      "keywords": ["Netflix", "Spotify", "Prime Video", "Hotstar", "Mutual Funds ICCL"]
+    },
+    {
+      "name": "Health & Medical",
+      "keywords": ["Apollo Pharmacy", "APOLLO PHARMACY", "RAVIS MEDI HOME PHARM",
+                   "Sai srinivas medical", "OM MEDICO", "YASHODA OP PHARMACY",
+                   "My WELLNESS CHEMIST", "WELLNESS FOREVER"]
+    },
+    {
+      "name": "Investments - SIP",
+      "keywords": ["SIP", "MOTILAL OSWAL MUTUAL FUND", "Zerodha", "Groww", "Kuvera",
+                   "ICICI PRU MF", "HDFC MF", "AXIS MF", "SBI MF", "Nippon"]
+    },
+    {
+      "name": "Stock Trading",
+      "keywords": ["Indian Cl", "Indian Clearing"]
+    },
+    {
+      "name": "Send Money - Family",
+      "keywords": [],
+      "people": ["AMBICA", "KISAN RAMLU", "Swapna", "HARSHA", "PaiElectronicsBNRDN", "VISHNUVARDHA", "BABU RAO"]
+    },
+    {
+      "name": "Send Money - Friends",
+      "keywords": [],
+      "people": ["SAKSHI", "Prithvi", "MOHIT", "Miss.", "SATYAJIT", "PRUTHVI"]
+    },
+    {
+      "name": "Fluff",
+      "keywords": ["PVR INOX", "BookMyShow", "EXHIBITION SOCIETY", "Forest Department"]
+    },
+    {
+      "name": "Cash Withdrawal",
+      "keywords": ["ATM", "CASH WDL", "CASH WITHDRAWAL", "BRN-PYMT-CARD", "CRD-PMNT"]
+    }
+  ]
+}
+

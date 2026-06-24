@@ -1,0 +1,14 @@
+{
+  "_comment": "Add one entry per SIP fund. Find your scheme_code by searching https://www.mfapi.in/ or https://api.mfapi.in/mf/search?q=YOUR_FUND_NAME . units_log is a running list of every SIP installment - add a new line each month after your SIP is debited. total_units and total_invested are auto-summed by the app from units_log, you don't need to maintain them by hand.",
+
+  "funds": [
+    {
+      "fund_name": "EXAMPLE - Parag Parikh Flexi Cap Fund",
+      "scheme_code": "122639",
+      "units_log": [
+        {"date": "2026-01-05", "amount_invested": 5000, "units_bought": 71.42, "nav_on_date": 70.01},
+        {"date": "2026-02-05", "amount_invested": 5000, "units_bought": 70.10, "nav_on_date": 71.32}
+      ]
+    }
+  ]
+}

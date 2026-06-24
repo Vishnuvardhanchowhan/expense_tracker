@@ -1,0 +1,55 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="aiohttp" />
+          <option value="altair" />
+          <option value="boto3" />
+          <option value="botocore" />
+          <option value="branca" />
+          <option value="cryptography" />
+          <option value="CryptPandas" />
+          <option value="extra-streamlit-components" />
+          <option value="folium" />
+          <option value="google-ai-generativelanguage" />
+          <option value="google-api-core" />
+          <option value="google-api-python-client" />
+          <option value="google-auth-httplib2" />
+          <option value="google-auth-oauthlib" />
+          <option value="google-genai" />
+          <option value="google-generativeai" />
+          <option value="gspread" />
+          <option value="jsonschema" />
+          <option value="langchain" />
+          <option value="langchain-core" />
+          <option value="langchain-text-splitters" />
+          <option value="langsmith" />
+          <option value="markdownlit" />
+          <option value="s3transfer" />
+          <option value="sentence-transformers" />
+          <option value="statsmodels" />
+          <option value="streamlit" />
+          <option value="streamlit-authenticator" />
+          <option value="streamlit-camera-input-live" />
+          <option value="streamlit-card" />
+          <option value="streamlit-embedcode" />
+          <option value="streamlit-extras" />
+          <option value="streamlit-faker" />
+          <option value="streamlit-folium" />
+          <option value="streamlit-image-coordinates" />
+          <option value="streamlit-keyup" />
+          <option value="streamlit-option-menu" />
+          <option value="streamlit-toggle-switch" />
+          <option value="streamlit-vertical-slider" />
+          <option value="streamlit-lottie" />
+          <option value="timm" />
+          <option value="tokenizers" />
+          <option value="torchvision" />
+          <option value="transformers" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
