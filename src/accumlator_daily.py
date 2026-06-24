@@ -56,46 +56,65 @@ def get_gmail_service():
     
     # Try to load from token file first (for local/persistent runs)
     if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+        try:
+            creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+            # Check if token is still valid
+            if creds.valid:
+                return build("gmail", "v1", credentials=creds)
+            elif creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                return build("gmail", "v1", credentials=creds)
+        except Exception:
+            pass  # Token file corrupted or invalid, get new one
     
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    # Load credentials from Streamlit secrets or file
+    credentials_data = None
+    
+    try:
+        # Try Streamlit secrets first (for cloud deployment)
+        credentials_data = json.loads(st.secrets["google"]["credentials_json"])
+    except (KeyError, FileNotFoundError, TypeError):
+        # Fall back to local credentials.json file
+        if os.path.exists(CREDENTIALS_FILE):
+            with open(CREDENTIALS_FILE) as f:
+                credentials_data = json.load(f)
         else:
-            # Load credentials from Streamlit secrets or file
-            credentials_data = None
-            
-            try:
-                # Try Streamlit secrets first (for cloud deployment)
-                credentials_data = json.loads(st.secrets["google"]["credentials_json"])
-            except (KeyError, FileNotFoundError):
-                # Fall back to local credentials.json file
-                if os.path.exists(CREDENTIALS_FILE):
-                    with open(CREDENTIALS_FILE) as f:
-                        credentials_data = json.load(f)
-                else:
-                    sys.exit(
-                        f"Missing credentials. Either:\n"
-                        f"1. Download OAuth credentials from Google Cloud Console and save as {CREDENTIALS_FILE}\n"
-                        f"2. Or add credentials to Streamlit secrets under [google]credentials_json"
-                    )
-            
-            # Write credentials to temp file for flow
-            temp_creds_file = Path("/tmp/credentials_temp.json")
-            with open(temp_creds_file, "w") as f:
-                json.dump(credentials_data, f)
-            
-            flow = InstalledAppFlow.from_client_secrets_file(str(temp_creds_file), SCOPES)
-            creds = flow.run_local_server(port=0)
-            
-            # Clean up temp file
-            temp_creds_file.unlink()
+            st.error(
+                "❌ Google credentials not found!\n\n"
+                "Please add credentials to Streamlit secrets:\n"
+                "1. Go to app settings ⚙️ → Secrets\n"
+                "2. Add: `[google]` section with `credentials_json`\n"
+                "3. Reboot app"
+            )
+            st.stop()
+    
+    # Write credentials to temp file for flow
+    temp_creds_file = Path("/tmp/credentials_temp.json")
+    try:
+        with open(temp_creds_file, "w") as f:
+            json.dump(credentials_data, f)
+        
+        flow = InstalledAppFlow.from_client_secrets_file(str(temp_creds_file), SCOPES)
+        
+        # Try local server first (for local development)
+        try:
+            creds = flow.run_local_server(port=0, open_browser=False)
+        except Exception:
+            # Fall back to console mode for Streamlit Cloud
+            creds = flow.run_console()
+        
+        # Clean up temp file
+        temp_creds_file.unlink(missing_ok=True)
         
         # Save token for future use
         with open(TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
+        
+        return build("gmail", "v1", credentials=creds)
     
-    return build("gmail", "v1", credentials=creds)
+    except Exception as e:
+        st.error(f"Authentication failed: {str(e)}")
+        st.stop()
 
 
 def build_gmail_query(start_date: str, end_date: str) -> str:
