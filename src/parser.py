@@ -179,25 +179,36 @@ def parse_all_statements(folder: str) -> pd.DataFrame:
     if not frames:
         return pd.DataFrame(columns=empty_cols)
     cumm_df = pd.concat(frames, ignore_index=True)
-    curr_date_run = date.today()
-    prev_day_run = curr_date_run - timedelta(days=1)
     
-    transactions = daily_spend_fetcher.fetch_axis_transactions(
-        prev_day_run.strftime("%Y-%m-%d"), 
-        curr_date_run.strftime("%Y-%m-%d")
-    )
+    # Only try to fetch daily transactions if token exists (already authenticated)
+    token_file = Path(daily_spend_fetcher.TOKEN_FILE)
+    if not token_file.exists():
+        print("[parser info] Gmail token not found - skipping daily transactions fetch")
+        return cumm_df
     
-    if transactions:
-        curr_day_df = pd.DataFrame(transactions)
-        curr_day_df["tran_date"] = pd.to_datetime(curr_day_df["tran_date"], format="%d-%m-%Y", errors="coerce")
-        curr_day_df = curr_day_df[curr_day_df["tran_date"].dt.date == curr_date_run]
+    try:
+        curr_date_run = date.today()
+        prev_day_run = curr_date_run - timedelta(days=1)
         
-        if not curr_day_df.empty:
-            last_prev_balance = cumm_df["balance"].iloc[-1] if not cumm_df.empty else 0
-            curr_day_df["balance"] = (last_prev_balance +
-                                      (curr_day_df["cr"].fillna(0) - curr_day_df["dr"].fillna(0)).cumsum())
+        transactions = daily_spend_fetcher.fetch_axis_transactions(
+            prev_day_run.strftime("%Y-%m-%d"), 
+            curr_date_run.strftime("%Y-%m-%d")
+        )
+        
+        if transactions:
+            curr_day_df = pd.DataFrame(transactions)
+            curr_day_df["tran_date"] = pd.to_datetime(curr_day_df["tran_date"], format="%d-%m-%Y", errors="coerce")
+            curr_day_df = curr_day_df[curr_day_df["tran_date"].dt.date == curr_date_run]
             
-            final_df = pd.concat([cumm_df, curr_day_df], ignore_index=True)
-            final_df = final_df.drop_duplicates(subset=["tran_date", "particulars", "dr", "cr"], keep="first").reset_index(drop=True)
-            return final_df
+            if not curr_day_df.empty:
+                last_prev_balance = cumm_df["balance"].iloc[-1] if not cumm_df.empty else 0
+                curr_day_df["balance"] = (last_prev_balance +
+                                          (curr_day_df["cr"].fillna(0) - curr_day_df["dr"].fillna(0)).cumsum())
+                
+                final_df = pd.concat([cumm_df, curr_day_df], ignore_index=True)
+                final_df = final_df.drop_duplicates(subset=["tran_date", "particulars", "dr", "cr"], keep="first").reset_index(drop=True)
+                return final_df
+    except Exception as e:
+        print(f"[parser warning] Failed to fetch daily transactions: {e}")
+    
     return cumm_df
