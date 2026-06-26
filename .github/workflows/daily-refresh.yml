@@ -1,0 +1,43 @@
+name: Daily Data Refresh
+
+on:
+  schedule:
+    # Run at 9:00 AM UTC (2:30 PM IST)
+    - cron: "0 9 * * *"
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Create secrets file
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml << 'EOF'
+          [google]
+          credentials_json = '${{ secrets.GOOGLE_CREDENTIALS }}'
+          token_json = '${{ secrets.GOOGLE_TOKEN }}'
+          EOF
+      
+      - name: Run data refresh
+        run: |
+          python -c "from src.build_master import build_master; df = build_master(); print(f'✅ Refreshed {len(df)} transactions')"
+      
+      - name: Commit and push updated data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "🔄 Daily data refresh - $(date)" || echo "No changes"
+          git push
