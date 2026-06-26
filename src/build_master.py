@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.parser import parse_all_statements
-from categorizer import categorize_dataframe
+from src.categorizer import categorize_dataframe
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATEMENTS_DIR = BASE_DIR / "data" / "statements"
