@@ -24,7 +24,6 @@ st.set_page_config(page_title="Expense Tracker", layout="wide")
 
 # ---------- Data loading ----------
 
-@st.cache_data(ttl=60)
 def load_transactions():
     df = build_master()
     if df.empty:
@@ -33,7 +32,6 @@ def load_transactions():
     return df
 
 
-@st.cache_data(ttl=300)
 def load_sip_summary():
     try:
         return get_sip_summary(str(SIP_HOLDINGS_PATH))

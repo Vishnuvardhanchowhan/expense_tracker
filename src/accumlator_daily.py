@@ -43,8 +43,10 @@ from openpyxl.utils import get_column_letter
 import streamlit as st
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
-TOKEN_FILE = "token.json"
-CREDENTIALS_FILE = "credentials.json"
+parent_dir = Path(__file__).resolve().parent
+grand_parent_dir = os.path.dirname(parent_dir)
+TOKEN_FILE = os.path.join(grand_parent_dir, "token.json")
+CREDENTIALS_FILE = os.path.join(grand_parent_dir, "credentials.json")
 
 SENDER_QUERY = "alerts@axis.bank.in"
 SUBJECT_QUERY = "transaction alert for Axis Bank"
@@ -206,44 +208,70 @@ def get_message_body_text(service, msg_id: str) -> str:
 
     return ""
 
-
 def parse_transaction(body: str):
     """
     Extract Tran Date, amount, DR/CR, and particulars from the email body.
-    Returns a dict or None if the body doesn't match the expected pattern.
+    Returns a dict or None if the body doesn't match any expected pattern.
     """
     text = re.sub(r"[ \t]+", " ", body)
     text = re.sub(r"\r\n|\r", "\n", text)
 
+    # ---------- Amount + direction ----------
     amount_match = re.search(
         r"Amount\s+(Credited|Debited)\s*:?\s*INR\s*([\d,]+\.\d{2})", text, re.IGNORECASE
     )
-    if not amount_match:
+    if amount_match:
+        direction, amount_str = amount_match.group(1), amount_match.group(2)
+    else:
         amount_match = re.search(
             r"INR\s*([\d,]+\.\d{2})\s*was\s*(credited|debited)", text, re.IGNORECASE
         )
         if amount_match:
             amount_str, direction = amount_match.group(1), amount_match.group(2)
         else:
-            return None
-    else:
-        direction, amount_str = amount_match.group(1), amount_match.group(2)
+            # "has been credited/debited with INR 6847.88"
+            amount_match = re.search(
+                r"(credited|debited)\s+with\s+INR\s*([\d,]+\.\d{2})",
+                text,
+                re.IGNORECASE,
+            )
+            if amount_match:
+                direction, amount_str = amount_match.group(1), amount_match.group(2)
+            else:
+                return None
 
     amount = float(amount_str.replace(",", ""))
     direction = direction.lower()
 
+    # ---------- Date ----------
     date_match = re.search(
         r"Date\s*&\s*Time\s*:?\s*([\d]{2}-[\d]{2}-[\d]{2,4}),?\s*([\d:]{5,8})\s*IST",
         text,
         re.IGNORECASE,
     )
-    tran_date = date_match.group(1) if date_match else ""
+    if date_match:
+        tran_date = date_match.group(1)
+    else:
+        # "on 25-06-2026 at 08:32:17 IST"
+        date_match2 = re.search(
+            r"\bon\s+([\d]{2}-[\d]{2}-[\d]{2,4})\s+at\s+([\d:]{5,8})\s*IST",
+            text,
+            re.IGNORECASE,
+        )
+        tran_date = date_match2.group(1) if date_match2 else ""
 
+    # ---------- Particulars ----------
     info_match = re.search(
         r"Transaction\s+Info\s*:?\s*([^\n]+)", text, re.IGNORECASE
     )
-    particulars = info_match.group(1).strip() if info_match else ""
+    if info_match:
+        particulars = info_match.group(1).strip()
+    else:
+        # "by NEFT/CMS1762611394246/MOTI" — strip trailing punctuation like a sentence-ending "."
+        info_match2 = re.search(r"\bby\s+([A-Z0-9/_\-\.]+)", text)
+        particulars = info_match2.group(1).strip().rstrip(".") if info_match2 else ""
 
+    # ---------- Balance ----------
     bal_match = re.search(
         r"(?:Available\s+Balance|Avl\s*Bal|Balance)\s*:?\s*INR?\s*([\d,]+\.\d{2})",
         text,
@@ -251,7 +279,10 @@ def parse_transaction(body: str):
     )
     balance = bal_match.group(1) if bal_match else ""
 
+    # ---------- Account ----------
     acct_match = re.search(r"A/c\s*(?:no\.?)?\s*[:\-]?\s*(XX\d+)", text, re.IGNORECASE)
+    if not acct_match:
+        acct_match = re.search(r"Account\s*Number\s*:?\s*(XX\d+)", text, re.IGNORECASE)
     account = acct_match.group(1) if acct_match else ""
 
     return {
@@ -308,41 +339,6 @@ def fetch_axis_transactions(start_date: str, end_date: str):
     return transactions
 
 
-def write_to_excel(transactions, out_path: str):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Axis Transactions"
-
-    headers = ["Tran Date", "PARTICULARS", "DR", "CR", "BAL"]
-    ws.append(headers)
-    for col_idx in range(1, len(headers) + 1):
-        cell = ws.cell(row=1, column=col_idx)
-        cell.font = Font(bold=True)
-        cell.alignment = Alignment(horizontal="center")
-
-    for t in transactions:
-        ws.append([
-            t["tran_date"],
-            t["particulars"],
-            t["dr"] if t["dr"] is not None else None,
-            t["cr"] if t["cr"] is not None else None,
-            t["bal"] if t["bal"] else None,
-        ])
-
-    for row in ws.iter_rows(min_row=2, min_col=3, max_col=5):
-        for cell in row:
-            if cell.value is not None:
-                cell.number_format = "#,##0.00"
-
-    widths = [14, 50, 14, 14, 14]
-    for i, w in enumerate(widths, start=1):
-        ws.column_dimensions[get_column_letter(i)].width = w
-
-    wb.save(out_path)
-    print(f"Saved {len(transactions)} transactions to {out_path}")
-
-
-
 if __name__ == "__main__":
-    transactions = fetch_axis_transactions('2026-06-13', date.today().strftime("%Y-%m-%d"))
-    st.dataframe(transactions)
+    transactions = fetch_axis_transactions('2026-06-25', '2026-06-25')
+    print(transactions)

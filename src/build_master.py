@@ -1,7 +1,7 @@
 """
 build_master.py
 Orchestrator: scans data/statements/ for monthly CSVs, parses each one,
-applies category rules, and writes data/master_transactions.csv.
+applies category rules, and writes data/master_transactions_historical.csv.
 
 Run this manually after dropping a new month's CSV into data/statements/,
 or call build_master() directly from the Streamlit app (it's fast enough
