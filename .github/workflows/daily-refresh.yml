@@ -2,8 +2,7 @@ name: Daily Data Refresh
 
 on:
   schedule:
-    # Run at 9:00 AM UTC (2:30 PM IST)
-    - cron: "0 9 * * *"
+    - cron: "30 3 * * *"   # 3:30 AM UTC = 9:00 AM IST
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
