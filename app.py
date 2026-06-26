@@ -13,8 +13,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
-from build_master import build_master, MASTER_PATH, RULES_PATH
-from sip_tracker import get_sip_summary
+from src.build_master import build_master, MASTER_PATH, RULES_PATH
+from src.sip_tracker import get_sip_summary
 
 BASE_DIR = Path(__file__).resolve().parent
 SIP_HOLDINGS_PATH = BASE_DIR / "data" / "mutual_fund_holdings.csv"

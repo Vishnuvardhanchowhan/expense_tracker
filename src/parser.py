@@ -12,7 +12,7 @@ import os
 from datetime import date, timedelta
 import pandas as pd
 from pathlib import Path
-import accumlator_daily_v2 as daily_spend_fetcher
+import src.accumlator_daily_v2 as daily_spend_fetcher
 
 
 def parse_all_statements(STATEMENTS_DIR: Path) -> pd.DataFrame:
