@@ -24,8 +24,8 @@ def parse_all_statements(STATEMENTS_DIR: Path) -> pd.DataFrame:
     if not token_file.exists():
         print("[parser info] Gmail token not found - skipping daily transactions fetch")
         return cumm_df
-    # curr_date_run = pd.to_datetime(date.today())
-    curr_date_run = pd.to_datetime('2026-06-26', format='%Y-%m-%d')
+    curr_date_run = pd.to_datetime(date.today())
+    # curr_date_run = pd.to_datetime('2026-06-26', format='%Y-%m-%d')
     prev_day_run = curr_date_run - timedelta(days=1)
 
     transactions = daily_spend_fetcher.fetch_axis_transactions(
