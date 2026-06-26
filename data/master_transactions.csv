@@ -991,15 +991,15 @@ date,description,amount,balance,financial_month,source_file,category,spend,incom
 2026-06-22,UPI/P2M/617367243941/TOBOX VENTURES PRIV,-90.0,8236.58,2026-06,master_transactions_historical.csv,Food & Dining,90.0,0.0,2026-06
 2026-06-22,UPI/P2M/617316958397/Sun Direct,-295.0,7941.58,2026-06,master_transactions_historical.csv,Bills & Utilities,295.0,0.0,2026-06
 2026-06-23,UPI/P2M/617459269174/HOTEL RAGHAVENDRA E,-20.0,7921.58,2026-06,master_transactions_historical.csv,Food & Dining,20.0,0.0,2026-06
-2026-06-23,UPI/P2M/617480955279/MUTUAL FUNDS NCL,-2245.0,5676.58,2026-06,master_transactions_historical.csv,Local Shops / Unknown Person,2245.0,0.0,2026-06
+2026-06-23,UPI/P2M/617480955279/MUTUAL FUNDS NCL,-2245.0,5676.58,2026-06,master_transactions_historical.csv,Stock Trading,2245.0,0.0,2026-06
 2026-06-24,UPI/P2M/617540234181/HOTEL RAGHAVENDRA E,-20.0,5656.58,2026-06,master_transactions_historical.csv,Food & Dining,20.0,0.0,2026-06
 2026-06-24,UPI/P2A/617569368206/Miss. SAKSHI VILAS,-400.0,5236.58,2026-06,master_transactions_historical.csv,Send Money - Friends,400.0,0.0,2026-06
 2026-06-24,UPI/P2M/109921082099/Indian Cl/ICICI Ban/Indian C//P2V/,-2500.0,2736.58,2026-06,master_transactions_historical.csv,Stock Trading,2500.0,0.0,2026-06
 2026-06-25,UPI/P2M/617611865449/TOBOX VENTURES PRIV,-120.0,2616.58,2026-06,master_transactions_historical.csv,Food & Dining,120.0,0.0,2026-06
 2026-06-25,UPI/P2M/617671598931/THE SOUTH VENUE,-20.0,2596.58,2026-06,master_transactions_historical.csv,Food & Dining,20.0,0.0,2026-06
 2026-06-25,UPI/P2M/617661274613/THE SOUTH VENUE,-135.0,2461.58,2026-06,master_transactions_historical.csv,Food & Dining,135.0,0.0,2026-06
-2026-06-25,NEFT/CMS1762611394246/MOTI,6847.88,9309.46,2026-06,master_transactions_historical.csv,Investments - SIP,0.0,6847.88,2026-06
-2026-06-25,NEFT/HDFCH01080465450/SBI,2213.74,11523.2,2026-06,master_transactions_historical.csv,Investments - SIP,0.0,2213.74,2026-06
+2026-06-25,NEFT/CMS1762611394246/MOTI,6847.88,9309.46,2026-06,master_transactions_historical.csv,Stock Trading,0.0,6847.88,2026-06
+2026-06-25,NEFT/HDFCH01080465450/SBI,2213.74,11523.2,2026-06,master_transactions_historical.csv,Stock Trading,0.0,2213.74,2026-06
 2026-06-26,UPI/P2A/209331706479/SAKSHI VI/CNRB/NA,15000.0,26523.2,2026-06,daily_transactions,Send Money - Friends,0.0,15000.0,2026-06
 2026-06-26,UPI/P2A/309273816871/Miss. SAKSHI VILAS,-15000.0,11523.2,2026-06,daily_transactions,Send Money - Friends,15000.0,0.0,2026-06
 2026-06-26,UPI/P2M/617772918421/HOTEL RAGHAVENDRA E,-20.0,11503.2,2026-06,daily_transactions,Food & Dining,20.0,0.0,2026-06
