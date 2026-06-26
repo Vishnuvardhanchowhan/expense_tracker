@@ -11,7 +11,7 @@ to just re-run on every dashboard load, which is what app.py does).
 from pathlib import Path
 import pandas as pd
 
-from parser import parse_all_statements
+from src.parser import parse_all_statements
 from categorizer import categorize_dataframe
 
 BASE_DIR = Path(__file__).resolve().parent.parent
