@@ -34,7 +34,7 @@ jobs:
       
       - name: Run data refresh
         run: |
-          python -c "from src.parser import parse_all_statements;from pathlib import Path; BASE_DIR = Path(__file__).resolve().parent.parent.parent; STATEMENTS_DIR = BASE_DIR / 'data' / 'statements'; df = parse_all_statements(STATEMENTS_DIR); print(f'✅ Refreshed {len(df)} transactions')'"
+          python -c "from src.parser import parse_all_statements;from pathlib import Path; BASE_DIR = Path(__file__).resolve().parent.parent.parent; STATEMENTS_DIR = BASE_DIR / 'data' / 'statements'; df = parse_all_statements(STATEMENTS_DIR); print(f'✅ Refreshed {len(df)} transactions')"
       
       - name: Commit and push updated data
         run: |
