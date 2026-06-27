@@ -23,14 +23,10 @@ def parse_all_statements(STATEMENTS_DIR: Path) -> pd.DataFrame:
     curr_date_run = pd.to_datetime(date.today())
     prev_day_run = curr_date_run - timedelta(days=1)
 
-    try:
-        transactions = daily_spend_fetcher.fetch_axis_transactions(
+    transactions = daily_spend_fetcher.fetch_axis_transactions(
             prev_day_run.strftime("%Y-%m-%d"),
             curr_date_run.strftime("%Y-%m-%d")
         )
-    except Exception as e:
-        print(f"[parser info] Gmail fetch failed/skipped: {e}")
-        return cumm_df
 
     transactions = pd.DataFrame(transactions)
     if not transactions.empty:
