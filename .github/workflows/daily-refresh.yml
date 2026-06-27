@@ -22,16 +22,15 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      
+
       - name: Create secrets file
         run: |
-          mkdir -p .streamlit
-          cat > .streamlit/secrets.toml << 'EOF'
+          mkdir -p src/.streamlit
+          cat > src/.streamlit/secrets.toml << 'EOF'
           [google]
           credentials_json = '${{ secrets.GOOGLE_CREDENTIALS }}'
           token_json = '${{ secrets.GOOGLE_TOKEN }}'
           EOF
-      
       - name: Run data refresh
         run: |
           python -c "from src.build_master import build_master; df = build_master(); print(f'✅ Refreshed {len(df)} transactions')"
