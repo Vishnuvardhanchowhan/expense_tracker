@@ -31,6 +31,7 @@ import json
 from datetime import datetime, date, timezone, timedelta
 from pathlib import Path
 
+import pandas as pd
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -352,5 +353,7 @@ def fetch_axis_transactions(start_date: str, end_date: str):
 
 
 if __name__ == "__main__":
-    transactions = fetch_axis_transactions('2026-06-25', '2026-06-25')
+    curr_date_run = pd.to_datetime(date.today())
+    prev_day_run = curr_date_run - timedelta(days=1)
+    transactions = fetch_axis_transactions(prev_day_run, curr_date_run)
     print(transactions)
