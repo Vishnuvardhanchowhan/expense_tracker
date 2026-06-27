@@ -22,7 +22,7 @@ MASTER_PATH = BASE_DIR / "data" / "master_transactions.csv"
 
 def build_master() -> pd.DataFrame:
 
-    print("Secrets accessible:", "google" in st.secrets)
+    # print("Secrets accessible:", "google" in st.secrets)
     df = parse_all_statements(STATEMENTS_DIR)
 
     if df.empty:
