@@ -25,8 +25,8 @@ jobs:
 
       - name: Create secrets file
         run: |
-          mkdir -p src/.streamlit
-          cat > src/.streamlit/secrets.toml << 'EOF'
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml << 'EOF'
           [google]
           credentials_json = '${{ secrets.GOOGLE_CREDENTIALS }}'
           token_json = '${{ secrets.GOOGLE_TOKEN }}'

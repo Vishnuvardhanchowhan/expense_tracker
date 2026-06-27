@@ -4,4 +4,3 @@ token.json
 __pycache__/
 *.pyc
 .pytest_cache
-src/.streamlit/secrets.toml
