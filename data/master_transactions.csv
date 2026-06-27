@@ -1003,3 +1003,6 @@ date,description,amount,balance,financial_month,source_file,category,spend,incom
 2026-06-26,UPI/P2A/209331706479/SAKSHI VI/CNRB/NA,15000.0,26523.2,2026-06,daily_transactions,Send Money - Friends,0.0,15000.0,2026-06
 2026-06-26,UPI/P2A/309273816871/Miss. SAKSHI VILAS,-15000.0,11523.2,2026-06,daily_transactions,Send Money - Friends,15000.0,0.0,2026-06
 2026-06-26,UPI/P2M/617772918421/HOTEL RAGHAVENDRA E,-20.0,11503.2,2026-06,daily_transactions,Food & Dining,20.0,0.0,2026-06
+2026-06-27,UPI/P2M/617804553488/MADHARAPU VIKAS GOU,-70.0,11433.2,2026-06,daily_transactions,Local Shops / Unknown Person,70.0,0.0,2026-06
+2026-06-27,UPI/P2M/617874522529/MRS TANGUTURI SAIL,-60.0,11373.2,2026-06,daily_transactions,Local Shops / Unknown Person,60.0,0.0,2026-06
+2026-06-27,UPI/P2A/309307398883/MOHIT KUMAR GOND,-7175.0,4198.200000000001,2026-06,daily_transactions,Send Money - Friends,7175.0,0.0,2026-06
