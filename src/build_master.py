@@ -10,7 +10,7 @@ to just re-run on every dashboard load, which is what app.py does).
 
 from pathlib import Path
 import pandas as pd
-
+import streamlit as st
 from src.parser import parse_all_statements
 from src.categorizer import categorize_dataframe
 
@@ -21,6 +21,8 @@ MASTER_PATH = BASE_DIR / "data" / "master_transactions.csv"
 
 
 def build_master() -> pd.DataFrame:
+
+    print("Secrets accessible:", "google" in st.secrets)
     df = parse_all_statements(STATEMENTS_DIR)
 
     if df.empty:
