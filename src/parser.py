@@ -19,19 +19,19 @@ def parse_all_statements(STATEMENTS_DIR: Path) -> pd.DataFrame:
     historical_transactions_file_path = os.path.join(STATEMENTS_DIR, "master_transactions_historical.csv")
     cumm_df = pd.read_csv(historical_transactions_file_path)
     cumm_df['date'] = pd.to_datetime(cumm_df['date'], format='mixed')
-    # Only try to fetch daily transactions if token exists (already authenticated)
-    token_file = Path(daily_spend_fetcher.TOKEN_FILE)
-    if not token_file.exists():
-        print("[parser info] Gmail token not found - skipping daily transactions fetch")
-        return cumm_df
+
     curr_date_run = pd.to_datetime(date.today())
-    # curr_date_run = pd.to_datetime('2026-06-26', format='%Y-%m-%d')
     prev_day_run = curr_date_run - timedelta(days=1)
 
-    transactions = daily_spend_fetcher.fetch_axis_transactions(
-        prev_day_run.strftime("%Y-%m-%d"),
-        curr_date_run.strftime("%Y-%m-%d")
-    )
+    try:
+        transactions = daily_spend_fetcher.fetch_axis_transactions(
+            prev_day_run.strftime("%Y-%m-%d"),
+            curr_date_run.strftime("%Y-%m-%d")
+        )
+    except Exception as e:
+        print(f"[parser info] Gmail fetch failed/skipped: {e}")
+        return cumm_df
+
     transactions = pd.DataFrame(transactions)
     if not transactions.empty:
         transactions["tran_date"] = pd.to_datetime(transactions["tran_date"], format="mixed", errors="coerce")
