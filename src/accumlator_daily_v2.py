@@ -54,33 +54,39 @@ SUBJECT_QUERY = "transaction alert for Axis Bank"
 
 
 def get_gmail_service():
-    """Authenticate with Gmail API and return a service object."""
     creds = None
 
-    # Try to load from token file first (for local/persistent runs)
     if os.path.exists(TOKEN_FILE):
         try:
             creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-            # Check if token is still valid
             if creds.valid:
+                print("[gmail auth] using valid token from TOKEN_FILE")
                 return build("gmail", "v1", credentials=creds)
             elif creds.expired and creds.refresh_token:
+                print("[gmail auth] refreshing expired token from TOKEN_FILE")
                 creds.refresh(Request())
                 return build("gmail", "v1", credentials=creds)
-        except Exception:
-            pass  # Token file corrupted or invalid, try secrets
+            else:
+                print(f"[gmail auth] TOKEN_FILE creds unusable: valid={creds.valid}, expired={creds.expired}, has_refresh_token={bool(creds.refresh_token)}")
+        except Exception as e:
+            print(f"[gmail auth] TOKEN_FILE load failed: {e}")
 
-    # Try to load token from Streamlit secrets (for cloud deployment)
     try:
         token_data = json.loads(st.secrets["google"]["token_json"])
         creds = Credentials.from_authorized_user_info(token_data, SCOPES)
         if creds.valid:
+            print("[gmail auth] using valid token from st.secrets")
             return build("gmail", "v1", credentials=creds)
         elif creds.expired and creds.refresh_token:
+            print("[gmail auth] refreshing expired token from st.secrets")
             creds.refresh(Request())
             return build("gmail", "v1", credentials=creds)
-    except (KeyError, FileNotFoundError, TypeError):
-        pass  # Token not in secrets, try credentials flow
+        else:
+            print(f"[gmail auth] st.secrets creds unusable: valid={creds.valid}, expired={creds.expired}, has_refresh_token={bool(creds.refresh_token)}")
+    except (KeyError, FileNotFoundError, TypeError) as e:
+        print(f"[gmail auth] st.secrets token read failed: {e}")
+
+    print("[gmail auth] falling through to interactive OAuth flow -- this WILL fail/hang in CI")
 
     # Load credentials from Streamlit secrets or file for OAuth flow
     credentials_data = None
