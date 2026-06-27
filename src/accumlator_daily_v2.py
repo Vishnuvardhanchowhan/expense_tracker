@@ -72,7 +72,9 @@ def get_gmail_service():
             print(f"[gmail auth] TOKEN_FILE load failed: {e}")
 
     try:
-        token_data = json.loads(st.secrets["google"]["token_json"])
+        raw = st.secrets["google"]["token_json"]
+        print(f"[debug] token_json length: {len(raw)!r}, first 10 chars: {raw[:10]!r}")
+        token_data = json.loads(raw)
         creds = Credentials.from_authorized_user_info(token_data, SCOPES)
         if creds.valid:
             print("[gmail auth] using valid token from st.secrets")
