@@ -251,6 +251,57 @@ div[data-testid="stTabs"] {{ margin-top: -0.5rem; }}
     color: {TEXT_DIM};
 }}
 
+/* ---------- Bar-list (long-label-safe alternative to chart axes) ---------- */
+/* Used anywhere labels can be arbitrarily long (fund names, categories).
+   Text wraps naturally as normal HTML — no axis, no rotation, no clipping. */
+.barlist {{
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 0.5rem;
+}}
+.barlist-row .barlist-top {{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.3rem;
+}}
+.barlist-row .barlist-label {{
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: {TEXT};
+    line-height: 1.3;
+    flex: 1 1 auto;
+    min-width: 0;
+    word-break: break-word;
+}}
+.barlist-row .barlist-value {{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: {TEXT};
+    white-space: nowrap;
+    flex-shrink: 0;
+}}
+.barlist-row .barlist-track {{
+    height: 8px;
+    border-radius: 999px;
+    background: {SURFACE_2};
+    overflow: hidden;
+}}
+.barlist-row .barlist-fill {{
+    height: 100%;
+    border-radius: 999px;
+}}
+.barlist-row .barlist-sub {{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+    font-size: 0.68rem;
+    color: {TEXT_DIM};
+}}
+
 /* Dataframes */
 div[data-testid="stDataFrame"] {{
     border-radius: 12px;
@@ -330,10 +381,25 @@ def style_fig(fig, height=240):
         margin=dict(l=10, r=10, t=10, b=10),
         height=height,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        # Disable drag-to-zoom/pan entirely — on mobile a vertical page-scroll
+        # that passes over the chart should scroll the page, not zoom the chart.
+        dragmode=False,
     )
-    fig.update_xaxes(gridcolor=BORDER, zerolinecolor=BORDER)
-    fig.update_yaxes(gridcolor=BORDER, zerolinecolor=BORDER)
+    fig.update_xaxes(gridcolor=BORDER, zerolinecolor=BORDER, fixedrange=True)
+    fig.update_yaxes(gridcolor=BORDER, zerolinecolor=BORDER, fixedrange=True)
     return fig
+
+
+# Shared config for every st.plotly_chart call: kills the mode bar, scroll-zoom,
+# double-click-zoom, and box/lasso select — taps still show tooltips, nothing
+# else responds to touch so a scroll gesture can never get hijacked as a zoom.
+PLOTLY_CONFIG = {
+    "displayModeBar": False,
+    "scrollZoom": False,
+    "doubleClick": False,
+    "showAxisDragHandles": False,
+    "displaylogo": False,
+}
 
 
 def metric_card_html(icon, badge_class, label, value):
@@ -350,6 +416,45 @@ def section_header(label, color):
         f'<div class="section-h"><span class="dot" style="background:{color}"></span>'
         f"{label}</div>"
     )
+
+
+def bar_list_html(rows, color, max_value=None, sub_rows=None):
+    """
+    rows: list of (label, value) tuples, value is numeric (₹).
+    color: hex string for the fill bar.
+    max_value: denominator for bar width; defaults to max of the values.
+    sub_rows: optional list of (left_text, right_text) per row, shown
+              under the bar (e.g. "Current Value" vs gain/loss %).
+    Renders each row as full-width wrapping text + value, with a bar
+    underneath — safe for labels of any length, unlike a chart axis.
+    """
+    if not rows:
+        return ""
+    denom = max_value if max_value else max((v for _, v in rows), default=1)
+    denom = denom if denom else 1
+    parts = ['<div class="barlist">']
+    for i, (label, value) in enumerate(rows):
+        pct = max(3, min(100, (value / denom) * 100))
+        sub_html = ""
+        if sub_rows and i < len(sub_rows):
+            left, right = sub_rows[i]
+            sub_html = (
+                f'<div class="barlist-sub"><span>{left}</span><span>{right}</span></div>'
+            )
+        parts.append(
+            '<div class="barlist-row">'
+            '<div class="barlist-top">'
+            f'<div class="barlist-label">{label}</div>'
+            f'<div class="barlist-value">₹{value:,.0f}</div>'
+            '</div>'
+            '<div class="barlist-track">'
+            f'<div class="barlist-fill" style="width:{pct:.0f}%;background:{color}"></div>'
+            '</div>'
+            f'{sub_html}'
+            '</div>'
+        )
+    parts.append('</div>')
+    return "".join(parts)
 
 
 # =====================================================================
@@ -492,7 +597,7 @@ if st.session_state.active_tab == "overview":
                   color_discrete_sequence=[INDIGO])
     fig.update_traces(line_width=3, marker_size=8)
     fig.update_layout(yaxis_title="", xaxis_title="")
-    st.plotly_chart(style_fig(fig), use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(style_fig(fig), use_container_width=True, config=PLOTLY_CONFIG)
 
     html(section_header(f"Category breakdown — {selected_month}", MINT))
     cat_breakdown = (
@@ -501,12 +606,9 @@ if st.session_state.active_tab == "overview":
         .reset_index()
     )
     cat_breakdown = cat_breakdown[cat_breakdown['net_spend'] > 0]
-    fig2 = px.pie(
-        cat_breakdown, names="category", values='net_spend', hole=0.62,
-        color_discrete_sequence=[MINT, INDIGO, CORAL, AMBER, "#9B8CFF", "#3DD9D6", "#FF8A65"],
-    )
-    fig2.update_traces(textposition="outside", textfont_size=10)
-    st.plotly_chart(style_fig(fig2, height=300), use_container_width=True, config={"displayModeBar": False})
+    cat_breakdown = cat_breakdown.sort_values('net_spend', ascending=False)
+    cat_rows = list(zip(cat_breakdown["category"], cat_breakdown["net_spend"]))
+    html(bar_list_html(cat_rows, color=MINT))
 
 
 # =====================================================================
@@ -524,7 +626,7 @@ elif st.session_state.active_tab == "category":
     fig3 = px.bar(cat_trend, x="month", y='net_spend', color_discrete_sequence=[INDIGO])
     fig3.update_layout(yaxis_title="", xaxis_title="")
     fig3.update_traces(marker_cornerradius=6)
-    st.plotly_chart(style_fig(fig3), use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(style_fig(fig3), use_container_width=True, config=PLOTLY_CONFIG)
 
     html(section_header(f"All transactions — {selected_cat}", TEXT_DIM))
     st.dataframe(
@@ -562,7 +664,7 @@ elif st.session_state.active_tab == "family":
         fig4 = px.bar(trend, x="month", y='net_spend', color="category", barmode="group",
                       color_discrete_sequence=[AMBER, INDIGO])
         fig4.update_layout(yaxis_title="", xaxis_title="", legend_title="")
-        st.plotly_chart(style_fig(fig4), use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(style_fig(fig4), use_container_width=True, config=PLOTLY_CONFIG)
 
         html(section_header("All transfers", TEXT_DIM))
         st.dataframe(
@@ -631,27 +733,23 @@ elif st.session_state.active_tab == "sip":
             hide_index=True,
         )
 
-        # Convert to long-form for plotting (handles mixed types in current_value)
-        plot_df = sip_df[["fund_name", "total_invested", "current_value"]].dropna(subset=["current_value"])
-        plot_df_melted = plot_df.melt(
-            id_vars="fund_name",
-            value_vars=["total_invested", "current_value"],
-            var_name="metric",
-            value_name="amount"
-        )
-        plot_df_melted["metric"] = plot_df_melted["metric"].map({
-            "total_invested": "Invested",
-            "current_value": "Current Value"
-        })
-
         html(section_header("Invested vs current", MINT))
-        fig5 = px.bar(
-            plot_df_melted, x="fund_name", y="amount", color="metric", barmode="group",
-            color_discrete_sequence=[INDIGO, MINT],
-        )
-        fig5.update_layout(yaxis_title="", xaxis_title="", legend_title="")
-        fig5.update_xaxes(tickangle=-30)
-        st.plotly_chart(style_fig(fig5, height=280), use_container_width=True, config={"displayModeBar": False})
+        fund_rows_df = sip_df[["fund_name", "total_invested", "current_value"]].dropna(
+            subset=["current_value"]
+        ).sort_values("current_value", ascending=False)
+
+        fund_rows = list(zip(fund_rows_df["fund_name"], fund_rows_df["current_value"]))
+        fund_subs = []
+        for _, r in fund_rows_df.iterrows():
+            gl = r["current_value"] - r["total_invested"]
+            gl_pct = (gl / r["total_invested"] * 100) if r["total_invested"] else 0
+            gl_color = MINT if gl >= 0 else CORAL
+            gl_sign = "+" if gl >= 0 else ""
+            fund_subs.append((
+                f"Invested ₹{r['total_invested']:,.0f}",
+                f'<span style="color:{gl_color}">{gl_sign}₹{gl:,.0f} ({gl_sign}{gl_pct:.1f}%)</span>',
+            ))
+        html(bar_list_html(fund_rows, color=MINT, sub_rows=fund_subs))
 
 
 # =====================================================================
