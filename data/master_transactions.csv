@@ -1008,3 +1008,4 @@ date,description,amount,balance,financial_month,source_file,category,spend,incom
 2026-06-27,UPI/P2A/309307398883/MOHIT KUMAR GOND,-7175.0,4198.200000000001,2026-06,daily_transactions,Send Money - Friends,7175.0,0.0,2026-06
 2026-06-28,UPI/P2A/617964674742/M AMBICA CHOWHAN,-20.0,4178.200000000001,2026-06,daily_transactions,Send Money - Family,20.0,0.0,2026-06
 2026-06-29,NEFT/HDFCH01085306391/INVE,98453.0,102631.2,2026-06,daily_transactions,Uncategorized,0.0,98453.0,2026-06
+2026-06-30,UPI/P2M/618102986575/Blinkit,-274.0,102357.2,2026-06,daily_transactions,Groceries,274.0,0.0,2026-06
